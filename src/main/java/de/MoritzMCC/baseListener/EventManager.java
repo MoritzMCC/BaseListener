@@ -1,9 +1,6 @@
 package de.MoritzMCC.baseListener;
 
-import de.MoritzMCC.anntotations.AnnotationRegestry;
-import de.MoritzMCC.anntotations.CancelCondition;
-import de.MoritzMCC.anntotations.cancelIf;
-import de.MoritzMCC.anntotations.isPlayer;
+import de.MoritzMCC.anntotations.AnnotationManger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
@@ -20,9 +17,12 @@ public class EventManager {
     @Getter
     private static EventManager instance;
     private final Set<BaseListener> listeners;
+    @Getter
+    private Plugin plugin;
 
     public EventManager(Plugin plugin) {
         listeners = new HashSet<>();
+        this.plugin = plugin;
         instance = this;
         registerAnnotations();
         Bukkit.getPluginManager().registerEvents( new MainListener(plugin), plugin);
@@ -42,22 +42,6 @@ public class EventManager {
     }
 
     private void registerAnnotations(){
-        AnnotationRegestry.builder()
-                .register(cancelIf.class, ((annotation, event) -> {
-                    if (!(event instanceof Cancellable cancelEvent))return true;
-                    try {
-                        CancelCondition<Event> condition = (CancelCondition<Event>) ((cancelIf) annotation).condition().getDeclaredConstructor().newInstance();
-                        if (condition.check(event)){
-                            cancelEvent.setCancelled(true);
-                            return false;
-                        }
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }return true;
-
-                }))
-                .register(isPlayer.class, ((annotation, event) ->{
-                    return event instanceof PlayerEvent ;
-                })).build();
+        new AnnotationManger(plugin).register();
     }
 }

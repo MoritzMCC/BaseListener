@@ -3,9 +3,10 @@ package de.MoritzMCC.anntotations;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AnnotationRegestry {
-    private static final Map<Class<? extends Annotation>, AnnotationHandler<?>> handlers = new HashMap<>();
+    private static final Map<Class<? extends Annotation>, AnnotationHandler<?>> handlers = new ConcurrentHashMap<>();
 
     private AnnotationRegestry() {}
 

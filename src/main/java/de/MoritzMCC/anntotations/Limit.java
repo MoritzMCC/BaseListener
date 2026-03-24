@@ -7,5 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Listen {
+public @interface Limit {
+    int limit() default 1;
+    int resetAfter() default 1; //seconds
+    Scope scope() default Scope.PLAYER;
 }

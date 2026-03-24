@@ -7,6 +7,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface isPlayer {
-}
+public @interface Cooldown {
+    int seconds() default 0;
+    int milliseconds() default 0;
+    Scope scope() default Scope.PLAYER;
 
+}
