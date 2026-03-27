@@ -42,7 +42,7 @@ public class ExampleListener extends BaseListener{
     }
 
     @Listen
-    @Limit(limit = 3, resetAfter = 5) //if not cancellabel just don't execute methode
+    @Limit(limit = 3, resetAfter = 5) //if not cancellable just don't execute methode
     public void onPlayerEnterBed(PlayerBedEnterEvent event) {
         getPlayer().sendMessage("sleep well");
     }
