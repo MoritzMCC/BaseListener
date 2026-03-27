@@ -26,17 +26,13 @@ public class ExampleListener extends BaseListener{
     }
 
     @Listen
-    @Cooldown(seconds = 3)
     public void onInventoryOpen(InventoryOpenEvent event) {
         event.getPlayer().sendMessage("hi");
-
     }
 
     @Listen
-    @Cooldown(seconds = 3)
     public void onEggThrow(PlayerEggThrowEvent event) {
         event.getPlayer().sendMessage("hi__");
-
     }
 
     @Listen
@@ -46,6 +42,7 @@ public class ExampleListener extends BaseListener{
     }
 
     @Listen
+    @Limit(limit = 3, resetAfter = 5) //if not cancellabel just don't execute methode
     public void onPlayerEnterBed(PlayerBedEnterEvent event) {
         getPlayer().sendMessage("sleep well");
     }

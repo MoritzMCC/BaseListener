@@ -15,8 +15,5 @@ public class Main extends JavaPlugin {
         instance = this;
         eventManager = new EventManager(this);
         new ExampleListener();
-
-
     }
-
 }
