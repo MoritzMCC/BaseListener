@@ -47,20 +47,6 @@ Add the dependency:
 
 ---
 
-### Important
-
-* `artifactId` **must match your GitHub repository name**
-* `version` = Git tag (recommended) or commit hash
-
-Example:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
----
-
 ## Quick Start
 
 Extend `BaseListener` and implement your event methods.
