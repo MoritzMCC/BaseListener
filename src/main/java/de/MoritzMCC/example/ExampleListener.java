@@ -51,7 +51,7 @@ public class ExampleListener extends BaseListener {
     }
 
     @Listen
-    @Limit(limit = 3, resetAfter = 5) //cancels event if trys more than limit times in resetAfter seconds
+    @Limit(limit = 3, resetAfter = 5) //cancels event if possible and not executing methode when event trys more than limit times in resetAfter seconds
     public void onPlayerEnterBed(PlayerBedEnterEvent event) {
         getPlayer().sendMessage("sleep well");
     }
