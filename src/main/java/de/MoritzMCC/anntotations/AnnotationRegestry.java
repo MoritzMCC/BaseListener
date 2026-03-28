@@ -14,6 +14,10 @@ public class AnnotationRegestry {
         return (AnnotationHandler<A>) handlers.get(annotationType);
     }
 
+    public static void registerHandler(Class<? extends Annotation> annotationType, AnnotationHandler<?> handler) {
+        handlers.put(annotationType, handler);
+    }
+
     public static Builder builder(){
         return new Builder();
     }

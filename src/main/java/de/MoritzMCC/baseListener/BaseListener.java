@@ -1,11 +1,9 @@
 package de.MoritzMCC.baseListener;
 
-import de.MoritzMCC.Main;
 import de.MoritzMCC.anntotations.AnnotationHandler;
 import de.MoritzMCC.anntotations.AnnotationRegestry;
-import de.MoritzMCC.anntotations.Async;
-import de.MoritzMCC.anntotations.Listen;
-import lombok.Setter;
+import de.MoritzMCC.anntotations.annotation.Async;
+import de.MoritzMCC.anntotations.annotation.Listen;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -13,7 +11,6 @@ import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.player.PlayerEvent;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -27,6 +24,7 @@ public abstract class BaseListener {
     }
 
     private final Map<Class<? extends Event>, List<Method>> handlers = new HashMap<>();
+    private final Map<Class<? extends Event>, List<HandlerMeta>> handlerMap = new HashMap<>();
 
     protected BaseListener() {
         for (Method method : this.getClass().getDeclaredMethods()) {
@@ -36,67 +34,47 @@ public abstract class BaseListener {
 
             Class<? extends Event> eventClass = (Class<? extends Event>) method.getParameterTypes()[0];
 
-            handlers.computeIfAbsent(eventClass, k -> new ArrayList<>()).add(method);
+            method.setAccessible(true);
+            handlerMap
+                    .computeIfAbsent(eventClass, k -> new ArrayList<>())
+                    .add(new HandlerMeta(method));
         }
 
         EventManager.getInstance().addListener(this);
     }
 
     public void dispatch(Event event) {
-        for (Map.Entry<Class<? extends Event>, List<Method>> entry : handlers.entrySet()) {
 
-            if (!entry.getKey().isAssignableFrom(event.getClass())) continue;
+        List<HandlerMeta> metas = handlerMap.get(event.getClass());
 
-            for (Method method : entry.getValue()) {
-                try {
-                    boolean proceed = true;
-                    boolean async = false;
-                    System.out.println("Annotations on " + method.getName() + ": " + Arrays.toString(method.getAnnotations()));
+        if (metas == null) return;
+        for (HandlerMeta meta : metas) {
+            try {
+                boolean proceed = true;
+                for (Annotation ann : meta.annotations) {
+                    if (ann instanceof Async) continue;
+                    AnnotationHandler handler =
+                            AnnotationRegestry.getHandler(ann.annotationType());
 
-                    for (Annotation ann : method.getAnnotations()) {
-                        if (ann instanceof Async) {
-                            async = true;
-                            continue;
-                        }
-                        Main.getInstance().getLogger().info(ann.annotationType().getSimpleName());
-                        AnnotationHandler handler = AnnotationRegestry.getHandler(ann.annotationType());
-
-                        if (handler != null) {
-                            proceed = handler.handle(ann, event, method);
-                            if (!proceed) break;
-                        }
+                    if (handler != null) {
+                        proceed = handler.handle(ann, event, meta.method);
+                        if (!proceed) break;
                     }
-
-                    if (!proceed) continue;
-
-                    method.setAccessible(true);
-
-
-                    if (async) {
-                        Bukkit.getScheduler().runTaskAsynchronously(
-                                EventManager.getInstance().getPlugin(),
-                                () -> {
-                                    try {
-                                        extractPlayer(event);
-                                        method.invoke(this, event);
-                                    }
-                                    catch (Exception e) {
-                                        e.printStackTrace();
-                                    }finally {
-                                        player.remove();
-                                    }
-                                }
-                        );
-                    } else {
-                        extractPlayer(event);
-                        method.invoke(this, event);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }finally {
-                    player.remove();
                 }
+
+                if (!proceed) continue;
+
+                if (meta.async) {
+                    Bukkit.getScheduler().runTaskAsynchronously(
+                            EventManager.getInstance().getPlugin(),
+                            () -> invoke(meta.method, event)
+                    );
+                } else {
+                    invoke(meta.method, event);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -108,5 +86,28 @@ public abstract class BaseListener {
         if (event instanceof PlayerEvent playerEvent) player.set(playerEvent.getPlayer());
         else if (event instanceof EntityEvent entityEvent && entityEvent.getEntity() instanceof Player p)player.set(p);
         else player.remove();
+    }
+
+    private void invoke(Method method, Event event) {
+        try {
+            extractPlayer(event);
+            method.invoke(this, event);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            player.remove();
+        }
+    }
+
+    private static class HandlerMeta{
+        final Method method;
+        final boolean async;
+        final List<Annotation> annotations;
+
+        public HandlerMeta(Method method) {
+            this.method = method;
+            async = method.isAnnotationPresent(Async.class);
+            annotations = Arrays.asList(method.getAnnotations());
+        }
     }
 }

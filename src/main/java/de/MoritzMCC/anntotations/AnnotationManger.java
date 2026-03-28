@@ -1,5 +1,6 @@
 package de.MoritzMCC.anntotations;
 
+import de.MoritzMCC.anntotations.annotation.*;
 import de.MoritzMCC.anntotations.impl.CooldownHandler;
 import de.MoritzMCC.anntotations.impl.LimitHandler;
 import org.bukkit.entity.EntityType;

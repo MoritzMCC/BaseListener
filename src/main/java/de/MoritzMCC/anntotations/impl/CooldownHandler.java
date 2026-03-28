@@ -1,14 +1,12 @@
 package de.MoritzMCC.anntotations.impl;
 
-import de.MoritzMCC.Main;
+import de.MoritzMCC.example.Main;
 import de.MoritzMCC.anntotations.AnnotationHandler;
-import de.MoritzMCC.anntotations.Cooldown;
-import de.MoritzMCC.anntotations.Scope;
+import de.MoritzMCC.anntotations.annotation.Cooldown;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerEvent;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +38,4 @@ public class CooldownHandler implements AnnotationHandler<Cooldown> {
                 return true;
         }
     }
-
-
 }

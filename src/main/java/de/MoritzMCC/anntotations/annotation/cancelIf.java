@@ -1,6 +1,6 @@
-package de.MoritzMCC.anntotations;
+package de.MoritzMCC.anntotations.annotation;
 
-import org.bukkit.entity.Player;
+import de.MoritzMCC.anntotations.CancelCondition;
 import org.bukkit.event.Event;
 
 import java.lang.annotation.ElementType;

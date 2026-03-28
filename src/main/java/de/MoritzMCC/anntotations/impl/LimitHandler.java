@@ -1,8 +1,8 @@
 package de.MoritzMCC.anntotations.impl;
 
-import de.MoritzMCC.Main;
+import de.MoritzMCC.example.Main;
 import de.MoritzMCC.anntotations.AnnotationHandler;
-import de.MoritzMCC.anntotations.Limit;
+import de.MoritzMCC.anntotations.annotation.Limit;
 import de.MoritzMCC.baseListener.EventManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -22,7 +22,6 @@ public class LimitHandler implements AnnotationHandler<Limit> {
     public boolean handle(Limit annotation, Event event, Method method) {
 
         String key = method.toGenericString();
-        Main.getInstance().getLogger().info("Limithandler called");
 
         switch (annotation.scope()) {
             case GLOBAL:

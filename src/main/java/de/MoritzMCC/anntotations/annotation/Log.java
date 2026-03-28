@@ -1,4 +1,4 @@
-package de.MoritzMCC.anntotations;
+package de.MoritzMCC.anntotations.annotation;
 
 public @interface Log {
     boolean playerName() default true;

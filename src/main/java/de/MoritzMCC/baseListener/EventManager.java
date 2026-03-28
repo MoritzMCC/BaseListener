@@ -3,13 +3,10 @@ package de.MoritzMCC.baseListener;
 import de.MoritzMCC.anntotations.AnnotationManger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class EventManager {

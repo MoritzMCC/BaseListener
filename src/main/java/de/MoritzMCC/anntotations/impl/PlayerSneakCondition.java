@@ -1,6 +1,5 @@
 package de.MoritzMCC.anntotations.impl;
 
-import de.MoritzMCC.Main;
 import de.MoritzMCC.anntotations.CancelCondition;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerEvent;

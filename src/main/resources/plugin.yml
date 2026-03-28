@@ -1,4 +1,4 @@
 name: BaseListener
 version: '1.0-SNAPSHOT'
-main: de.MoritzMCC.Main
+main: de.MoritzMCC.example.Main
 api-version: '1.21'
