@@ -22,17 +22,41 @@ It replaces traditional listeners with a clean, declarative, and extensible syst
 
 ## Installation
 
-### Option 1: Local Module
+### Maven (JitPack)
 
-Add the framework as a module to your project.
+Add the JitPack repository:
 
-### Option 2: Manual
-
-Copy the required packages into your project:
-
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
-de.MoritzMCC.baseListener  
-de.MoritzMCC.annotations
+
+Add the dependency:
+
+```xml
+<dependency>
+    <groupId>com.github.MoritzMCC</groupId>
+    <artifactId>BaseListener</artifactId>
+    <version>v1.0.0</version>
+</dependency>
+```
+
+---
+
+### Important
+
+* `artifactId` **must match your GitHub repository name**
+* `version` = Git tag (recommended) or commit hash
+
+Example:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 ---
@@ -140,7 +164,7 @@ The framework is designed to be extensible via custom annotations.
 3. Register the handler using:
 
 ```
-AnnotationRegestry
+BaseListener.registerAnnotationHandler(...)
 ```
 
 ---
@@ -186,14 +210,6 @@ Execute Method (sync/async)
 * Improve readability and maintainability
 * Enable modular logic through annotations
 * Keep runtime overhead minimal
-
----
-
-## Summary
-
-This framework replaces traditional event listeners with a declarative approach based on annotations and modular logic.
-
-For practical usage, refer to the example package.
 
 ---
 
