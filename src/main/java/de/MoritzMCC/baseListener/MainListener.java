@@ -1,5 +1,6 @@
 package de.MoritzMCC.baseListener;
 
+import de.MoritzMCC.events.EventRegistry;
 import de.MoritzMCC.example.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -7,6 +8,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.reflections.Reflections;
+
+import java.util.Set;
 
 public class MainListener implements Listener {
 
@@ -19,7 +22,9 @@ public class MainListener implements Listener {
 
     private void registerAllEvents() {
 
-        for (Class<? extends Event> eventClass : new Reflections("org.bukkit.event").getSubTypesOf(Event.class)) {
+        Set<Class<? extends Event>> events = new Reflections("org.bukkit.event").getSubTypesOf(Event.class);
+        events.addAll(EventRegistry.getCustomEvents());
+        for (Class<? extends Event> eventClass : events) {
 
              try {
                  Main.getInstance().getLogger().info("start registering event " + eventClass.getSimpleName());

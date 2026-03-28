@@ -2,6 +2,7 @@ package de.MoritzMCC.example;
 
 import de.MoritzMCC.anntotations.AnnotationRegestry;
 import de.MoritzMCC.baseListener.EventManager;
+import de.MoritzMCC.events.EventRegistry;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,6 +14,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        registerCustomEvents();
         eventManager = new EventManager(this); //before Listeners
         registerCustomAnnotations(); // before Listeners
         new ExampleListener();
@@ -26,6 +28,10 @@ public class Main extends JavaPlugin {
         /*
         or AnnotationRegestry.registerHandler(ExampleAnnotation.class, new ExampleAnnotationHandler());
          */
+    }
+
+    private void registerCustomEvents() {
+        EventRegistry.registerCustomEvent(ExampleCustomEvent.class);
     }
 
 }

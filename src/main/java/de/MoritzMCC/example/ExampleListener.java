@@ -3,6 +3,7 @@ package de.MoritzMCC.example;
 import de.MoritzMCC.anntotations.annotation.*;
 import de.MoritzMCC.anntotations.impl.PlayerSneakCondition;
 import de.MoritzMCC.baseListener.BaseListener;
+import org.bukkit.Bukkit;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -21,8 +22,10 @@ public class ExampleListener extends BaseListener {
     }
 
 
-    @Listen //
+    @Listen
+    @Async
     public void onJoin(PlayerJoinEvent event) {
+        //runs async
         event.setJoinMessage("HALLO HALLO");
     }
 
@@ -41,7 +44,7 @@ public class ExampleListener extends BaseListener {
     @Listen
     public void onEggThrow(PlayerEggThrowEvent event) {
         event.getPlayer().sendMessage("hi__");
-
+        Bukkit.getPluginManager().callEvent(new ExampleCustomEvent(getPlayer()));
     }
 
     @Listen
@@ -54,6 +57,11 @@ public class ExampleListener extends BaseListener {
     @Limit(limit = 3, resetAfter = 5) //cancels event if possible and not executing methode when event trys more than limit times in resetAfter seconds
     public void onPlayerEnterBed(PlayerBedEnterEvent event) {
         getPlayer().sendMessage("sleep well");
+    }
+
+    @Listen
+    public void onExampleEvent(ExampleCustomEvent event) {
+        getPlayer().sendMessage("custom event");
     }
 
 }

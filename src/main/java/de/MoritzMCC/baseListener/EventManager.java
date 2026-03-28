@@ -41,4 +41,5 @@ public class EventManager {
     private void registerAnnotations(){
         new AnnotationManger(plugin).register();
     }
+
 }
