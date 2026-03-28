@@ -164,7 +164,7 @@ The framework is designed to be extensible via custom annotations.
 3. Register the handler using:
 
 ```
-BaseListener.registerAnnotationHandler(...)
+AnnotationRegestry
 ```
 
 ---
