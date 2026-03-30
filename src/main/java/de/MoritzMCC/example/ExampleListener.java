@@ -53,7 +53,7 @@ public class ExampleListener extends BaseListener {
     @requiresPlayer //only executes Methode if event is instance of PlayerEvent or Entity is a Player
     public void onEntityDamage(EntityDamageEvent event) {
         getPlayer().sendMessage("you took damage"); // getPlayer() -> event.getPlayer() or (Player) entity
-        //getPlayer() can be null if event has no PLayer or Entity
+        //getPlayer() can be null if event has no PLayer or Entity so using @requiresPlayer is recommended
     }
 
     @Listen
@@ -70,6 +70,7 @@ public class ExampleListener extends BaseListener {
     }
 
     @Listen
+    @requiresPlayer
     public void onExampleEvent(ExampleCustomEvent event) {
         getPlayer().sendMessage("custom event");
     }
