@@ -28,6 +28,7 @@ public class AnnotationManger {
                 .register(Cooldown.class, new CooldownHandler())
                 .register(Limit.class, new LimitHandler())
                 .register(requiresPlayer.class, this::requiresPlayer)
+                .register(isEntityType.class, this::isEntityType)
                 .build();
     }
 
@@ -78,6 +79,11 @@ public class AnnotationManger {
         }
         setPlayer(player,method);
         return true;
+    }
+
+    private boolean isEntityType(isEntityType annotation, Event event, Method method){
+        return event instanceof EntityEvent entityEvent
+                && entityEvent.getEntityType().equals(annotation.value());
     }
 
     private void setPlayer(Player player, Method method){

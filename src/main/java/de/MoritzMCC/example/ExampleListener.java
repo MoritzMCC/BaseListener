@@ -4,7 +4,10 @@ import de.MoritzMCC.anntotations.annotation.*;
 import de.MoritzMCC.anntotations.impl.PlayerSneakCondition;
 import de.MoritzMCC.baseListener.BaseListener;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
@@ -38,7 +41,6 @@ public class ExampleListener extends BaseListener {
     @Listen
     public void onInventoryOpen(InventoryOpenEvent event) {
         event.getPlayer().sendMessage("hi");
-
     }
 
     @Listen
@@ -51,6 +53,14 @@ public class ExampleListener extends BaseListener {
     @requiresPlayer //only executes Methode if event is instance of PlayerEvent or Entity is a Player
     public void onEntityDamage(EntityDamageEvent event) {
         getPlayer().sendMessage("you took damage"); // getPlayer() -> event.getPlayer() or (Player) entity
+        //getPlayer() can be null if event has no PLayer or Entity
+    }
+
+    @Listen
+    @isEntityType(EntityType.ZOMBIE)
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        Zombie zombie = (Zombie) event.getEntity();
+        zombie.setCustomName("Peter");
     }
 
     @Listen
@@ -63,5 +73,6 @@ public class ExampleListener extends BaseListener {
     public void onExampleEvent(ExampleCustomEvent event) {
         getPlayer().sendMessage("custom event");
     }
+
 
 }
