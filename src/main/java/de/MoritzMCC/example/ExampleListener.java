@@ -1,12 +1,14 @@
 package de.MoritzMCC.example;
 
 import de.MoritzMCC.anntotations.annotation.*;
+import de.MoritzMCC.anntotations.annotation.parameter.Inject;
 import de.MoritzMCC.anntotations.impl.PlayerSneakCondition;
 import de.MoritzMCC.baseListener.BaseListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -81,7 +83,7 @@ public class ExampleListener extends BaseListener {
 
     @Listen
     @Holding(Material.STICK)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        getPlayer().sendMessage("interact");
+    public void onPlayerInteract(PlayerInteractEvent event, @Inject Player player) {
+        player.sendMessage("interact");
     }
 }

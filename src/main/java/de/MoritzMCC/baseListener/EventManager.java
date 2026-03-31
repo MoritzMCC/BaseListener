@@ -1,6 +1,7 @@
 package de.MoritzMCC.baseListener;
 
 import de.MoritzMCC.anntotations.AnnotationManger;
+import de.MoritzMCC.parameterresolver.ParameterManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -9,13 +10,13 @@ import org.bukkit.plugin.Plugin;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public class EventManager {
 
     @Getter
     private static EventManager instance;
     private final Set<BaseListener> listeners;
-    @Getter
-    private Plugin plugin;
+    private final Plugin plugin;
 
     public EventManager(Plugin plugin) {
         listeners = new HashSet<>();
@@ -23,6 +24,7 @@ public class EventManager {
         instance = this;
         registerAnnotations();
         Bukkit.getPluginManager().registerEvents( new MainListener(plugin), plugin);
+        registerParameterResolver();
     }
 
     public void addListener(BaseListener listener) {
@@ -40,6 +42,9 @@ public class EventManager {
 
     private void registerAnnotations(){
         new AnnotationManger(plugin).register();
+    }
+    private void registerParameterResolver(){
+        ParameterManager.register();
     }
 
 }

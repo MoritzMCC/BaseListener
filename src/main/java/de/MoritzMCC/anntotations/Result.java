@@ -1,8 +1,5 @@
 package de.MoritzMCC.anntotations;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 public enum Result {
     CONTINUE,
     SKIP,
