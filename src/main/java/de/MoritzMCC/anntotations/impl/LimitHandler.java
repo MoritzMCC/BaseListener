@@ -1,5 +1,6 @@
 package de.MoritzMCC.anntotations.impl;
 
+import de.MoritzMCC.anntotations.Result;
 import de.MoritzMCC.example.Main;
 import de.MoritzMCC.anntotations.AnnotationHandler;
 import de.MoritzMCC.anntotations.annotation.Limit;
@@ -19,29 +20,29 @@ public class LimitHandler implements AnnotationHandler<Limit> {
     Map<String, LimitData> limitMethods = new ConcurrentHashMap<>();
 
     @Override
-    public boolean handle(Limit annotation, Event event, Method method) {
+    public Result handle(Limit annotation, Event event, Method method) {
 
         String key = method.toGenericString();
 
         switch (annotation.scope()) {
             case GLOBAL:
                 LimitData global = limitMethods.computeIfAbsent(key, k -> new LimitData());
-                if (global.count >= annotation.limit())return cancelEvent(event);
+                if (global.count >= annotation.limit())return Result.CANCEL;
                 global.count++;
                 decrementSchedule(()->
                         {if (--global.count <= 0){
                                 limitMethods.remove(key);
                         }},
                         annotation.resetAfter());
-                return true;
+                return Result.CONTINUE;
 
             case PLAYER:
             default:
-                if (!(event instanceof PlayerEvent playerEvent))return true;
+                if (!(event instanceof PlayerEvent playerEvent))return Result.SKIP;
                 UUID uuid = playerEvent.getPlayer().getUniqueId();
                 Map<String,LimitData> map = limits.computeIfAbsent(uuid, k -> new ConcurrentHashMap<>());
                 LimitData limit = map.computeIfAbsent(key, k -> new LimitData());
-                if (limit.count >= annotation.limit())return cancelEvent(playerEvent);
+                if (limit.count >= annotation.limit())return Result.CANCEL;
                 limit.count++;
                 decrementSchedule(()-> {
                     if (--limit.count <= 0){
@@ -51,7 +52,7 @@ public class LimitHandler implements AnnotationHandler<Limit> {
                         }
                     }
                 },annotation.resetAfter());
-                return true;
+                return Result.CONTINUE;
         }
     }
 

@@ -1,6 +1,7 @@
 package de.MoritzMCC.example;
 
 import de.MoritzMCC.anntotations.AnnotationHandler;
+import de.MoritzMCC.anntotations.Result;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
@@ -22,15 +23,15 @@ public class ExampleAnnotationHandler implements AnnotationHandler<ExampleAnnota
      * cancelEvent() returns false and cancels the event if possible
      */
     @Override
-    public boolean handle(ExampleAnnotation annotation, Event event, Method method) {
+    public Result handle(ExampleAnnotation annotation, Event event, Method method) {
 
-        if(event instanceof Cancellable)return cancelEvent(event);
+        if(event instanceof Cancellable)return Result.CANCEL;
         Main.getInstance().getLogger().info(annotation.value());
 
         /**
          * if (User.getUser(event.getPlayer()).hasRank(XY))return true;
          * return false;
          */
-        return true;
+        return Result.CONTINUE;
     }
 }

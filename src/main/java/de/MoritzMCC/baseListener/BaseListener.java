@@ -2,10 +2,13 @@ package de.MoritzMCC.baseListener;
 
 import de.MoritzMCC.anntotations.AnnotationHandler;
 import de.MoritzMCC.anntotations.AnnotationRegestry;
+import de.MoritzMCC.anntotations.Result;
 import de.MoritzMCC.anntotations.annotation.Async;
+import de.MoritzMCC.anntotations.annotation.Delay;
 import de.MoritzMCC.anntotations.annotation.Listen;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.player.PlayerEvent;
@@ -50,27 +53,39 @@ public abstract class BaseListener {
         if (metas == null) return;
         for (HandlerMeta meta : metas) {
             try {
-                boolean proceed = true;
+                Result result = Result.CONTINUE;
+                int delay = 0;
                 for (Annotation ann : meta.annotations) {
                     if (ann instanceof Async) continue;
+                    if (ann instanceof Delay delay1){
+                        delay += delay1.ticks();
+                        continue;
+                    }
+
                     AnnotationHandler handler =
                             AnnotationRegestry.getHandler(ann.annotationType());
 
                     if (handler != null) {
-                        proceed = handler.handle(ann, event, meta.method);
-                        if (!proceed) break;
+                        result = handler.handle(ann, event, meta.method);
+                        if (result.shouldCancel() && event instanceof Cancellable cancellable){
+                            cancellable.setCancelled(true);
+                        }
+                        if (!result.shouldContinue()) break;
                     }
                 }
 
-                if (!proceed) continue;
+                if (!result.shouldContinue())continue;
 
                 if (meta.async) {
-                    Bukkit.getScheduler().runTaskAsynchronously(
+                    Bukkit.getScheduler().runTaskLaterAsynchronously(
                             EventManager.getInstance().getPlugin(),
-                            () -> invoke(meta.method, event)
+                            () -> invoke(meta.method, event), delay
                     );
                 } else {
-                    invoke(meta.method, event);
+                    Bukkit.getScheduler().runTaskLater(
+                        EventManager.getInstance().getPlugin(),
+                            () -> invoke(meta.method, event), delay
+                    );
                 }
 
             } catch (Exception e) {
@@ -110,4 +125,5 @@ public abstract class BaseListener {
             annotations = Arrays.asList(method.getAnnotations());
         }
     }
+
 }

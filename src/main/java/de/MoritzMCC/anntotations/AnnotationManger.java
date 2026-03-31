@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 public class AnnotationManger {
     private final Plugin plugin;
@@ -29,24 +30,25 @@ public class AnnotationManger {
                 .register(Limit.class, new LimitHandler())
                 .register(requiresPlayer.class, this::requiresPlayer)
                 .register(isEntityType.class, this::isEntityType)
+                .register(Gamemode.class, this::hasGamemode)
+                .register(Holding.class, this::holdsItem)
                 .build();
     }
 
-    private boolean cancelIf(cancelIf annotation, Event event, Method method){
-        if (!(event instanceof Cancellable cancelEvent))return true;
+    private Result cancelIf(cancelIf annotation, Event event, Method method){
+        if (!(event instanceof Cancellable cancelEvent))return Result.CONTINUE;
         try {
             CancelCondition<Event> condition = (CancelCondition<Event>) (annotation).condition().getDeclaredConstructor().newInstance();
             if (condition.check(event) || annotation.cancel()){
-                cancelEvent.setCancelled(true);
-                return false;
+                return Result.CANCEL;
             }
 
         }catch (Exception e){
             e.printStackTrace();
-        }return true;
+        }return Result.CONTINUE;
     }
 
-    private boolean log(Log annotation, Event event, Method method){
+    private Result log(Log annotation, Event event, Method method){
         StringBuilder sb = new StringBuilder();
 
         if (event instanceof BlockEvent be && annotation.blockType())sb.append("[block type] ").append(be.getBlock().getType().name());
@@ -60,39 +62,45 @@ public class AnnotationManger {
         sb.append(annotation.message());
         plugin.getLogger().info(sb.toString());
 
-        return true;
+        return Result.CONTINUE;
     }
 
-    private boolean permission(Permission annotation, Event event, Method method){
-        return (event instanceof PlayerEvent playerEvent) &&  playerEvent.getPlayer().hasPermission(annotation.permission());
+    private Result permission(Permission annotation, Event event, Method method){
+        return Result.get ((event instanceof PlayerEvent playerEvent) &&  playerEvent.getPlayer().hasPermission(annotation.permission()));
     }
 
-    private boolean requiresPlayer(requiresPlayer annotation, Event event, Method method){
+    private Result requiresPlayer(requiresPlayer annotation, Event event, Method method){
+        return withPlayer(event, p -> Result.CONTINUE);
+    }
 
-        Player player = null;
+    private Result isEntityType(isEntityType annotation, Event event, Method method){
+        return Result.get(event instanceof EntityEvent entityEvent
+                && entityEvent.getEntityType().equals(annotation.value()));
+    }
+
+
+    private Player extractPlayer(Event event){
         if (event instanceof PlayerEvent playerEvent) {
-            player = playerEvent.getPlayer();
+            return playerEvent.getPlayer();
         }else if (event instanceof EntityEvent entityEvent && entityEvent.getEntityType().equals(EntityType.PLAYER)) {
-            player = (Player) entityEvent.getEntity();
+            return  (Player) entityEvent.getEntity();
         }else {
-            return false;
+            return null;
         }
-        setPlayer(player,method);
-        return true;
+    }
+    private Result withPlayer(Event event, Function<Player,Result> action){
+        Player player = extractPlayer(event);
+        if (player == null)return Result.SKIP;
+        return action.apply(player);
     }
 
-    private boolean isEntityType(isEntityType annotation, Event event, Method method){
-        return event instanceof EntityEvent entityEvent
-                && entityEvent.getEntityType().equals(annotation.value());
+    private Result hasGamemode(Gamemode annotation, Event event, Method method){
+        return withPlayer(event, player ->
+                Result.get(player.getGameMode().equals(annotation.value())));
     }
 
-    private void setPlayer(Player player, Method method){
-        try {
-           Method setPlayerListener = method.getDeclaringClass().getMethod("setPlayer",Player.class);
-           setPlayerListener.invoke(player,player);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
+    private Result holdsItem(Holding annotation, Event event, Method method){
+        return withPlayer(event, player ->
+                player.getInventory().getItemInMainHand().getType().equals(annotation.value()) ? Result.CONTINUE : Result.SKIP);
     }
 }

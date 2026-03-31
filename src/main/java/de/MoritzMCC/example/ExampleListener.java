@@ -4,15 +4,14 @@ import de.MoritzMCC.anntotations.annotation.*;
 import de.MoritzMCC.anntotations.impl.PlayerSneakCondition;
 import de.MoritzMCC.baseListener.BaseListener;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerEggThrowEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 
 
 /**
@@ -74,6 +73,15 @@ public class ExampleListener extends BaseListener {
     public void onExampleEvent(ExampleCustomEvent event) {
         getPlayer().sendMessage("custom event");
     }
+    @Listen
+    @Gamemode(GameMode.SURVIVAL)
+    public void onPlayerSwapItem(PlayerSwapHandItemsEvent event) {
+        getPlayer().sendMessage("swap");
+    }
 
-
+    @Listen
+    @Holding(Material.STICK)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        getPlayer().sendMessage("interact");
+    }
 }
