@@ -54,7 +54,7 @@ Extend `BaseListener` and implement your event methods.
 A full working example can be found in:
 
 ```
-de.MoritzMCC.example.ExampleListener
+de.moritzmcc.example.ExampleListener
 ```
 
 ---
@@ -160,7 +160,7 @@ AnnotationRegestry
 A complete usage example demonstrating all features is available in:
 
 ```
-de.MoritzMCC.example
+de.moritzmcc.example
 ```
 
 ---
