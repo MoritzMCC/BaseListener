@@ -41,7 +41,7 @@ Add the dependency:
 <dependency>
     <groupId>com.github.MoritzMCC</groupId>
     <artifactId>BaseListener</artifactId>
-    <version>v1.0.0</version>
+    <version>v2.0.0</version>
 </dependency>
 ```
 
@@ -76,8 +76,8 @@ Marks a method as an event handler.
 
 **Requirements:**
 
-* Exactly one parameter
-* Parameter must extend `Event`
+* Exactly one parameter must extend `Event`
+* Additional parameters can be resolved via a `ParameterResolver` (e.g. `@Inject Player`, `@PlayersNearby List<Player>`)
 
 ---
 
@@ -87,7 +87,7 @@ Executes the handler asynchronously using the Bukkit scheduler.
 
 ---
 
-### `@requiresPlayer`
+### `@RequiresPlayer`
 
 Ensures that a player is available for the event.
 
@@ -98,15 +98,22 @@ Supports:
 
 Provides access via:
 
-```
+\`\`\`
 getPlayer()
-```
+\`\`\`
 
 ---
 
-### `@cancelIf`
+### `@CancelIf`
 
 Cancels the event and skips execution if a condition is met.
+
+Parameters:
+
+* `condition`: a `CancelCondition` implementation evaluated against the event
+* `cancel`: if `true`, always cancels regardless of the condition
+
+Only has an effect on `Cancellable` events.
 
 ---
 
@@ -118,6 +125,7 @@ Parameters:
 
 * `limit`: maximum executions
 * `resetAfter`: reset time in seconds
+* `scope`: `PLAYER` (per player) or `GLOBAL` (shared across all players)
 
 Behavior:
 
@@ -127,13 +135,124 @@ Behavior:
 
 ---
 
+### `@Cooldown`
+
+Enforces a cooldown between executions of a handler.
+
+Parameters:
+
+* `seconds` / `milliseconds`: cooldown duration
+* `scope`: `PLAYER` (per player) or `GLOBAL` (shared across all players)
+
+Behavior:
+
+* Cancels the event while the cooldown is active
+* Cooldown starts fresh on every allowed execution
+
+---
+
+### `@Throttle`
+
+Rate-limits how often a handler can run within a sliding time window, independent of player.
+
+Parameters:
+
+* `calls`: maximum allowed calls per window
+* `perSeconds`: window length in seconds
+
+Behavior:
+
+* Skips execution once the call limit for the current window is exceeded
+
+---
+
+### `@Permission`
+
+Requires the player associated with the event to hold a specific permission.
+
+Parameters:
+
+* `permission`: the permission node to check
+
+---
+
+### `@Gamemode`
+
+Requires the player to be in a specific game mode.
+
+Parameters:
+
+* `value`: the required `GameMode`
+
+---
+
+### `@Holding`
+
+Requires the player to be holding a specific item in their main hand.
+
+Parameters:
+
+* `value`: the required `Material`
+
+---
+
+### `@IsEntityType`
+
+Requires the event's entity to be of a specific type.
+
+Parameters:
+
+* `value`: the required `EntityType`
+
+---
+
+### `@Log`
+
+Logs information about the event when the handler runs.
+
+Parameters:
+
+* `playerName`, `eventName`, `location`, `blockType`, `id`: toggle which details are logged (booleans)
+* `message`: additional custom text appended to the log line
+
+---
+
+### `@Delay`
+
+Delays execution of the handler by a number of ticks.
+
+Parameters:
+
+* `ticks`: delay before the method is invoked
+
+Can be combined with `@Async` to delay asynchronous execution as well.
+
+---
+
+### `@Inject` (parameter annotation)
+
+Purely documentational marker for an injected parameter. Resolution is handled entirely by the registered `ParameterResolver`s — the annotation itself carries no logic.
+
+---
+
+### `@PlayersNearby` (parameter annotation)
+
+Injects a `List<Player>` of players near the entity/player associated with the event.
+
+Parameters:
+
+* `radius`: search radius in blocks
+* `minPlayers`: minimum number of nearby players required; if not met, an empty list is injected instead
+
+---
+
 ## Player Access
 
 Instead of manually extracting the player from each event, use:
 
-```
+\`\`\`
 getPlayer()
-```
+\`\`\`
 
 The framework automatically resolves the player when possible.
 
@@ -149,9 +268,9 @@ The framework is designed to be extensible via custom annotations.
 2. Implement an `AnnotationHandler`
 3. Register the handler using:
 
-```
-AnnotationRegestry
-```
+\`\`\`
+AnnotationRegistry
+\`\`\`
 
 ---
 
@@ -159,15 +278,15 @@ AnnotationRegestry
 
 A complete usage example demonstrating all features is available in:
 
-```
+\`\`\`
 de.moritzmcc.example
-```
+\`\`\`
 
 ---
 
 ## Execution Flow
 
-```
+\`\`\`
 Event Fired
    ↓
 Find Matching Methods
@@ -177,16 +296,16 @@ Process Annotations
 All Conditions Passed?
    ↓ yes
 Execute Method (sync/async)
-```
+\`\`\`
 
 ---
 
 ## Important Notes
 
-* Exact event matching (no inheritance-based dispatch)
+* Handlers are matched by type hierarchy: a handler declared for an abstract/parent event type also runs for its subtypes
 * Async handlers must be thread-safe
 * Exceptions inside handlers are caught and logged
-* Each handler method must have exactly one parameter
+* Each handler method must have exactly one `Event` parameter; further parameters are resolved via `ParameterResolver`s
 
 ---
 
