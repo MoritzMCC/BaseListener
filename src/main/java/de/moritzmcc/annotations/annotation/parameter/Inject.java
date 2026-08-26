@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Rein dokumentierende Markierung: kennzeichnet einen Parameter als "wird injiziert".
- * Die tatsaechliche Aufloesung erfolgt ausschliesslich ueber {@link de.moritzmcc.parameterresolver.ParameterResolver#canResolve},
- * diese Annotation selbst hat keinen Einfluss auf die Aufloesungslogik.
+ * Purely documentational marker that flags a parameter as "will be injected".
+ * Actual resolution happens exclusively via {@link de.moritzmcc.parameterresolver.ParameterResolver#canResolve};
+ * this annotation itself has no effect on the resolution logic.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

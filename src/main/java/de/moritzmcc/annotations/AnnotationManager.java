@@ -18,9 +18,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 /**
- * Registriert die eingebauten Annotation-Handler.
- * Rein logisch unveraendert gegenueber der Ausgangsversion, bis auf den Fix,
- * dass {@code CancelIf} pro Handler-Klasse nur einmal instanziiert werden muss.
+ * Registers the built-in annotation handlers.
  */
 public class AnnotationManager {
 
@@ -57,9 +55,9 @@ public class AnnotationManager {
                 return Result.CANCEL;
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("Fehler im CancelIf-Handler: " + e.getMessage());
+            plugin.getLogger().severe("Error in CancelIf handler: " + e.getMessage());
             if (plugin.getLogger().isLoggable(Level.FINE)) {
-                plugin.getLogger().log(Level.FINE, "CancelIf-Handler Fehler", e);
+                plugin.getLogger().log(Level.FINE, "CancelIf handler error", e);
             }
         }
         return Result.CONTINUE;
@@ -86,8 +84,14 @@ public class AnnotationManager {
                 sb.append("[event location] ").append(playerEvent.getPlayer().getLocation());
             }
         }
-        sb.append(annotation.message());
-        plugin.getLogger().info(sb.toString());
+        if(! annotation.message().isEmpty()) {
+            sb.append(annotation.message());
+        }
+
+        if(!sb.isEmpty()) {
+            String msg = sb.toString();
+            plugin.getLogger().info(msg);
+        }
 
         return Result.CONTINUE;
     }
