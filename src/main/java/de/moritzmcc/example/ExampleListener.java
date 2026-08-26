@@ -19,7 +19,15 @@ import org.bukkit.event.player.*;
 import java.util.List;
 
 /**
- * Beispiel fuer eine BaseListener-Implementierung
+ * Example listener demonstrating the different features provided by the
+ * annotation-based event system.
+ *
+ * <p>
+ * This class shows how events can be handled using annotations instead of
+ * manually registering individual Bukkit event listeners. Annotations can be
+ * used to add conditions, inject parameters, run handlers asynchronously,
+ * limit event executions, and access nearby players or the affected player.
+ * </p>
  */
 public class ExampleListener extends BaseListener {
 
@@ -30,67 +38,88 @@ public class ExampleListener extends BaseListener {
     @Listen
     @Async
     public void onJoin(PlayerJoinEvent event) {
-        // laeuft asynchron
+        // Runs the event handler asynchronously.
         event.setJoinMessage("HALLO HALLO");
     }
 
     @Listen
     @CancelIf(condition = PlayerSneakCondition.class)
     public void onMove(PlayerMoveEvent event) {
-        // beliebige Logik
+        // The handler is cancelled when the specified condition is met.
+        // Add any movement-related logic here.
     }
 
     @Listen
     public void onInventoryOpen(InventoryOpenEvent event) {
+        // Sends a message to the player when they open an inventory.
         event.getPlayer().sendMessage("hi");
     }
 
     @Listen
     public void onEggThrow(PlayerEggThrowEvent event) {
         event.getPlayer().sendMessage("hi__");
+
+        // Manually triggers a custom Bukkit event.
         Bukkit.getPluginManager().callEvent(new ExampleCustomEvent(getPlayer()));
     }
 
     @Listen
-    @RequiresPlayer // fuehrt die Methode nur aus, wenn das Event ein PlayerEvent ist oder die Entity ein Player ist
+    @RequiresPlayer
     public void onEntityDamage(EntityDamageEvent event) {
-        getPlayer().sendMessage("you took damage"); // getPlayer() -> event.getPlayer() bzw. (Player) entity
-        // getPlayer() kann null sein, wenn das Event keinen Player/keine Entity hat - daher @RequiresPlayer empfohlen
+        // Only runs when the event is associated with a player.
+        getPlayer().sendMessage("you took damage");
+
+        // getPlayer() returns the player associated with the event.
+        // It can return null if the event does not have a player or entity.
+        // Therefore, @RequiresPlayer is recommended when using getPlayer().
     }
 
     @Listen
     @IsEntityType(EntityType.ZOMBIE)
     public void onEntitySpawn(EntitySpawnEvent event) {
+        // Only handles spawn events for zombies.
         Zombie zombie = (Zombie) event.getEntity();
         zombie.setCustomName("Peter");
     }
 
     @Listen
-    @Limit(limit = 3, resetAfter = 5) // cancelt das Event und verhindert die Ausfuehrung, wenn es haeufiger als "limit" mal in "resetAfter" Sekunden ausgeloest wird
+    @Limit(limit = 3, resetAfter = 5)
     public void onPlayerEnterBed(PlayerBedEnterEvent event) {
+        // Limits the handler to 3 executions within 5 seconds.
+        // Further executions are cancelled until the limit resets.
         getPlayer().sendMessage("sleep well");
     }
 
     @Listen
     @RequiresPlayer
     public void onExampleEvent(ExampleCustomEvent event) {
+        // Only runs when the custom event has an associated player.
         getPlayer().sendMessage("custom event");
     }
 
     @Listen
     @Gamemode(GameMode.SURVIVAL)
     public void onPlayerSwapItem(PlayerSwapHandItemsEvent event) {
+        // Only runs when the player is in Survival mode.
         getPlayer().sendMessage("swap");
     }
 
     @Listen
     @Holding(Material.STICK)
     public void onPlayerInteract(PlayerInteractEvent event, @Inject Player player) {
+        // Only runs when the player is holding a stick.
+        // @Inject automatically provides the player associated with the event.
         player.sendMessage("interact");
     }
 
     @Listen
-    public void onTeleport(PlayerTeleportEvent event, @PlayersNearby(radius = 10) List<Player> nearbyPlayers) {
-        nearbyPlayers.forEach(player -> player.sendMessage("someone teleported nearby"));
+    public void onTeleport(
+            PlayerTeleportEvent event,
+            @PlayersNearby(radius = 10) List<Player> nearbyPlayers
+    ) {
+        // Automatically provides all players within a 10-block radius.
+        nearbyPlayers.forEach(
+                player -> player.sendMessage("someone teleported nearby")
+        );
     }
 }
