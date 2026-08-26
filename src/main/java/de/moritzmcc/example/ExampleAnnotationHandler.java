@@ -8,20 +8,17 @@ import org.bukkit.event.Event;
 import java.lang.reflect.Method;
 
 /**
- * Beispiel-Handler fuer eine eigene Annotation.
- *
- * FIX gegenueber der Ausgangsversion: dort wurde bei einem Cancellable-Event sofort
- * Result.CANCEL zurueckgegeben, BEVOR die Log-Zeile ausgefuehrt wurde - das Beispiel
- * suggerierte damit faelschlich, @ExampleAnnotation wuerde nie loggen, wenn das Event
- * cancelbar ist. Jetzt: erst loggen, dann ggf. canceln.
+ * Example handler for a custom annotation.
+ * <p>The event is always logged first; if it happens to be cancellable, it is
+ * cancelled afterward.</p>
  */
 public class ExampleAnnotationHandler implements AnnotationHandler<ExampleAnnotation> {
 
     /**
-     * @param annotation die zu verarbeitende Annotation
-     * @param event      das Event der Methode
-     * @param method     die annotierte Methode
-     * @return ob die Methode ausgefuehrt werden soll
+     * @param annotation the annotation being processed
+     * @param event      the event of the method
+     * @param method     the annotated method
+     * @return whether the method should be executed
      */
     @Override
     public Result handle(ExampleAnnotation annotation, Event event, Method method) {

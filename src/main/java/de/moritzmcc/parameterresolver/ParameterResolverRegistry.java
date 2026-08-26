@@ -9,7 +9,6 @@ public class ParameterResolverRegistry {
     private static final List<ParameterResolver> resolvers = new ArrayList<>();
 
     private ParameterResolverRegistry() {
-        /* Utility-Klasse, keine Instanzen */
     }
 
     public static List<ParameterResolver> getResolvers() {
